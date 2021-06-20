@@ -1,0 +1,107 @@
+version: "3"
+
+volumes:
+    postgresql_data:
+    solr_data:
+    mysql_data:
+    mongo_data:
+    # postgresql_airflow_data:
+
+networks:
+    frontend:
+    backend:
+
+services:
+    
+    postgresql:
+        container_name: postgresql
+        build:
+            context: .
+            dockerfile: postgresql/Dockerfile
+            args:
+                - POSTGRES_DB=${POSTGRESQL_DB}
+                - POSTGRES_USER=${POSTGRESQL_USER}
+                - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
+                - DS_DB=${DATASTORE_DB}
+                - DS_RO_USER=${DATASTORE_READONLY_USER}
+                - DS_RO_PASS=${DATASTORE_READONLY_PASSWORD}
+                - AIRFLOW_USER=${AIRFLOW_USER}
+                - AIRFLOW_PASSWORD=${AIRFLOW_PASSWORD}
+                - AIRFLOW_DB=${AIRFLOW_DB}
+        environment:
+            - POSTGRES_DB=${POSTGRESQL_DB}
+            - POSTGRES_USER=${POSTGRESQL_USER}
+            - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
+            - DS_DB=${DATASTORE_DB}
+            - DS_RO_USER=${DATASTORE_READONLY_USER}
+            - DS_RO_PASS=${DATASTORE_READONLY_PASSWORD}
+            - AIRFLOW_USER=${AIRFLOW_USER}
+            - AIRFLOW_PASSWORD=${AIRFLOW_PASSWORD}
+            - AIRFLOW_DB=${AIRFLOW_DB}
+        networks:
+            - backend
+        volumes:
+            - postgresql_data:/var/lib/postgresql/data
+        ports:
+            - ${POSTGRESQL_PORT}:5432
+        healthcheck:
+            test: ["CMD", "pg_isready", "-d ckan -U sandang"]
+
+    solr:
+        container_name: solr
+        build:
+            context: .
+            dockerfile: solr/Dockerfile
+            args:
+                - SOLR_CORE=${SOLR_CORE}
+                - SOLR_USER=${SOLR_USER}
+                - SOLR_VERSION=${SOLR_VERSION}
+                - CKAN_VERSION=${CKAN_VERSION}
+        networks:
+            - backend
+        volumes:
+            - solr_data:/opt/solr/server/solr/ckan/data
+        ports:
+            - ${SOLR_PORT}:8983
+
+    redis:
+        container_name: redis
+        image: redis:${REDIS_VERSION}
+        ports:
+            - ${REDIS_PORT}:6379
+        networks:
+            - backend
+        restart: always
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 30s
+            retries: 50
+
+    mysql:
+        container_name: mysql
+        image: mysql:${MYSQL_VERSION}
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - backend
+        cap_add:
+            - SYS_NICE
+        security_opt:
+            - seccomp:unconfined
+
+    mongo:
+        container_name: mongo
+        image: mongo:${MONGO_VERSION}
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+        volumes:
+            - mongo_data:/data/db
+        networks:
+            - backend

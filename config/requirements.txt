@@ -1,0 +1,15 @@
+setuptools==44.1.0
+wheel
+psycopg2
+psycopg2-binary
+numpy
+uwsgi==2.0.19.1 
+gevent==20.6.2 
+greenlet==0.4.16
+pymongo==3.11.1
+mongo-schema
+mysql-connector-python==8.0.22
+python-pcre
+jsonpickle
+python-dotenv
+apache-airflow

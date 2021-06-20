@@ -1,0 +1,5 @@
+# Include .env file
+!.env
+storage/
+.python-version
+who.ini
