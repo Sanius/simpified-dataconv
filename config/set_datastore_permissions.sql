@@ -1,4 +1,3 @@
-[[34m2021-06-20 14:12:46,110[0m] {[34mpysolr.py:[0m382} INFO[0m - Finished 'http://localhost:8983/solr/ckan/select/?q=%2A%3A%2A&rows=1&wt=json' (get) with body '' in 0.006 seconds, with status 200[0m
 /*
 This script configures the permissions for the datastore.
 
