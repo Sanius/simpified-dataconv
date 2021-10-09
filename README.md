@@ -20,8 +20,8 @@
     - To install CKAN 2.9.2 and ckanext-mysql2mongodb, run:
     ```bash
     python3 -m pip install --upgrade pip
+    python3 -m pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.9.4#egg=ckan[requirements]'
     python3 -m pip install -r ./config/requirements.txt
-    python3 -m pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.9.2#egg=ckan[requirements]'
     cd $PYENV_ROOT/versions/ckan/src/ckan/ckanext/
     git clone https://github.com/Sanius/ckanext-mysql2mongodb@develop && cd ckanext-mysql2mongodb
     python3 setup.py develop
@@ -44,7 +44,7 @@
     ```
     - Link to **who.ini**:
     ```bash
-    ln -s $PYENV_ROOT/versions/ckan/src/ckan/who.ini ./config/who.ini
+    ln -s $PYENV_ROOT/versions/{python_virtualenv}/src/ckan/who.ini ./config/who.ini
     ```
     - Run docker inside **./compose**
     - Initialize ckan database and create sysadmin:
