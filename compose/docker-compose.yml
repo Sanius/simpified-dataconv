@@ -14,7 +14,7 @@ networks:
 services:
     
     postgresql:
-        container_name: dataconv_postgresql
+        container_name: dataconv-postgresql
         build:
             context: .
             dockerfile: postgresql/Dockerfile
@@ -48,7 +48,7 @@ services:
             test: ["CMD", "pg_isready", "-d ckan -U sandang"]
 
     solr:
-        container_name: dataconv_solr
+        container_name: dataconv-solr
         build:
             context: .
             dockerfile: solr/Dockerfile
@@ -65,7 +65,7 @@ services:
             - ${SOLR_PORT}:8983
 
     redis:
-        container_name: dataconv_redis
+        container_name: dataconv-redis
         image: redis:${REDIS_VERSION}
         ports:
             - ${REDIS_PORT}:6379
@@ -79,7 +79,7 @@ services:
             retries: 50
 
     mysql:
-        container_name: dataconv_mysql
+        container_name: dataconv-mysql
         image: mysql:${MYSQL_VERSION}
         command: --default-authentication-plugin=mysql_native_password
         environment:
@@ -89,7 +89,7 @@ services:
         volumes:
             - mysql_data:/var/lib/mysql
         ports:
-            - ${MYSQL_PORT}:6379
+            - ${MYSQL_PORT}:3306
         networks:
             - backend
         cap_add:
@@ -98,7 +98,7 @@ services:
             - seccomp:unconfined
 
     mongo:
-        container_name: dataconv_mongo
+        container_name: dataconv-mongo
         image: mongo:${MONGO_VERSION}
         environment:
             - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
@@ -106,6 +106,6 @@ services:
         volumes:
             - mongo_data:/data/db
         ports:
-            - ${MONGO_PORT}:6379
+            - ${MONGO_PORT}:27017
         networks:
             - backend

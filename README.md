@@ -1,8 +1,8 @@
 # simpified DATA CONVERSION MYSQL TO MONGODB 
 
 ## Stack:
-- python 3.8.5
-- ckan 2.9.2
+- python 3.8.12
+- ckan 2.9.4
 - postgres 13
 - solr 6.6.6
 - redis 6.0.7
@@ -13,17 +13,18 @@
 1. Install and configure [CKAN](https://docs.ckan.org/en/2.9/maintaining/installing/install-from-source.html):
     - Install python virtual environment:
     ```bash
-    pyenv install 3.8.5
-    pyenv virtualenv 3.8.5 ckan
-    pyenv activate ckan
+    pyenv install 3.8.12
+    pyenv virtualenv 3.8.12 dataconv
+    pyenv activate dataconv
     ```
     - To install CKAN 2.9.2 and ckanext-mysql2mongodb, run:
     ```bash
     python3 -m pip install --upgrade pip
+    python3 -m pip install -r ./config/pre-ckan-installation.txt
     python3 -m pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.9.4#egg=ckan[requirements]'
-    python3 -m pip install -r ./config/requirements.txt
-    cd $PYENV_ROOT/versions/ckan/src/ckan/ckanext/
-    git clone https://github.com/Sanius/ckanext-mysql2mongodb@develop && cd ckanext-mysql2mongodb
+    python3 -m pip install -r ./config/post-ckan-installation.txt
+    cd $PYENV_ROOT/versions/dataconv/src/ckan/ckanext/
+    git clone https://github.com/Sanius/ckanext-mysql2mongodb && cd ckanext-mysql2mongodb
     python3 setup.py develop
     ```
     - Generate ckan config file:
@@ -44,7 +45,7 @@
     ```
     - Link to **who.ini**:
     ```bash
-    ln -s $PYENV_ROOT/versions/{python_virtualenv}/src/ckan/who.ini ./config/who.ini
+    ln -s $PYENV_ROOT/versions/dataconv/src/ckan/who.ini ./config/who.ini
     ```
     - Run docker inside **./compose**
     - Initialize ckan database and create sysadmin:
