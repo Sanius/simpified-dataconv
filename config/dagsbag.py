@@ -1,7 +1,7 @@
 """ add additional DAGs folders """
 import os
 from airflow.models import DagBag
-dags_dirs = ['/home/sania/.pyenv/versions/ckan/src/ckan/ckanext/ckanext-mysql2mongodb/ckanext/mysql2mongodb/data_conv/dag']
+dags_dirs = ['$PYENV_ROOT/versions/dataconv/src/ckan/ckanext/ckanext_mysql2mongodb/ckanext/mysql2mongodb/dataconv/dag']
 
 for dir in dags_dirs:
     dag_bag = DagBag(os.path.expanduser(dir))

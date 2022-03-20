@@ -1,53 +1,34 @@
 version: "3"
 
 volumes:
-    postgresql_data:
+    postgres_data:
     solr_data:
     mysql_data:
     mongo_data:
-    # postgresql_airflow_data:
 
 networks:
-    frontend:
-    backend:
+    dataconv_network:
 
 services:
     
-    postgresql:
-        container_name: dataconv-postgresql
-        build:
-            context: .
-            dockerfile: postgresql/Dockerfile
-            args:
-                - POSTGRES_DB=${POSTGRESQL_DB}
-                - POSTGRES_USER=${POSTGRESQL_USER}
-                - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
-                - DS_DB=${DATASTORE_DB}
-                - DS_RO_USER=${DATASTORE_READONLY_USER}
-                - DS_RO_PASS=${DATASTORE_READONLY_PASSWORD}
-                - AIRFLOW_USER=${AIRFLOW_USER}
-                - AIRFLOW_PASSWORD=${AIRFLOW_PASSWORD}
-                - AIRFLOW_DB=${AIRFLOW_DB}
-        environment:
-            - POSTGRES_DB=${POSTGRESQL_DB}
-            - POSTGRES_USER=${POSTGRESQL_USER}
-            - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
-            - DS_DB=${DATASTORE_DB}
-            - DS_RO_USER=${DATASTORE_READONLY_USER}
-            - DS_RO_PASS=${DATASTORE_READONLY_PASSWORD}
-            - AIRFLOW_USER=${AIRFLOW_USER}
-            - AIRFLOW_PASSWORD=${AIRFLOW_PASSWORD}
-            - AIRFLOW_DB=${AIRFLOW_DB}
-        networks:
-            - backend
-        volumes:
-            - postgresql_data:/var/lib/postgresql/data
+    dataconv-postgres:
+        image: postgres:13
+        container_name: dataconv-postgres
         ports:
-            - ${POSTGRESQL_PORT}:5432
+            - ${DATACONV_POSTGRES_PORT}:5432
+        networks:
+            - dataconv_network
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - ./postgres:/docker-entrypoint-initdb.d
+        environment:
+            POSTGRES_USER: ${DATACONV_POSTGRES_USERNAME}
+            POSTGRES_PASSWORD: ${DATACONV_POSTGRES_PASSWORD}
+            POSTGRES_MULTIPLE_DATABASES: dataconv_ckan, dataconv_datastore, dataconv_airflow
         healthcheck:
-            test: ["CMD", "pg_isready", "-d ckan -U sandang"]
+            test: ["CMD", "pg_isready", "-d dataconv_ckan -U sandang"]
 
-    solr:
+    dataconv-solr:
         container_name: dataconv-solr
         build:
             context: .
@@ -55,22 +36,21 @@ services:
             args:
                 - SOLR_CORE=${SOLR_CORE}
                 - SOLR_USER=${SOLR_USER}
-                - SOLR_VERSION=${SOLR_VERSION}
                 - CKAN_VERSION=${CKAN_VERSION}
         networks:
-            - backend
+            - dataconv_network
         volumes:
-            - solr_data:/opt/solr/server/solr/ckan/data
+            - solr_data:/opt/solr/server/solr/dataconv_ckan/data
         ports:
             - ${SOLR_PORT}:8983
 
-    redis:
+    dataconv-redis:
         container_name: dataconv-redis
-        image: redis:${REDIS_VERSION}
+        image: redis:6.2.6
         ports:
             - ${REDIS_PORT}:6379
         networks:
-            - backend
+            - dataconv_network
         restart: always
         healthcheck:
             test: ["CMD", "redis-cli", "ping"]
@@ -78,9 +58,9 @@ services:
             timeout: 30s
             retries: 50
 
-    mysql:
+    dataconv-mysql:
         container_name: dataconv-mysql
-        image: mysql:${MYSQL_VERSION}
+        image: mysql:8.0.28
         command: --default-authentication-plugin=mysql_native_password
         environment:
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -88,24 +68,27 @@ services:
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         volumes:
             - mysql_data:/var/lib/mysql
+            - ./mysql/db-init:/docker-entrypoint-initdb.d
         ports:
             - ${MYSQL_PORT}:3306
         networks:
-            - backend
+            - dataconv_network
+        restart: always
         cap_add:
             - SYS_NICE
         security_opt:
             - seccomp:unconfined
 
-    mongo:
+    dataconv-mongo:
         container_name: dataconv-mongo
-        image: mongo:${MONGO_VERSION}
+        image: mongo:4.4.13
         environment:
-            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+            - MONGO_INITDB_DATABASE=${MONGO_DB}
         volumes:
-            - mongo_data:/data/db
+            - mongo_data:/data/
         ports:
             - ${MONGO_PORT}:27017
         networks:
-            - backend
+            - dataconv_network
