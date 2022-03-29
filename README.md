@@ -65,8 +65,8 @@
     - Copy ./config/airflow.cfg paste to ~/airflow/airflow.cfg
     - Initialize airflow database and create airflow admin:
     ```bash
-    python3.8 -m airflow db init
-    python3.8 -m airflow users create --role Admin --username sandang -f san -l dang -e sandang@email.com
+    python3 -m airflow db init
+    python3 -m airflow users create --role Admin --username sandang -f san -l dang -e sandang@email.com
     ```
     - Compare ~/airflow/airflow.cfg with ./config/airflow.cfg
     - Create **dags** directory inside $AIRFLOW_HOME and copy ./config/dagsbag.py into it.
@@ -78,8 +78,8 @@
     ```bash
     ckan -c ./config/ckan.ini jobs worker
     ckan -c ./config/ckan.ini run
-    python3.8 -m airflow scheduler
-    python3.8 -m airflow webserver
+    python3 -m airflow scheduler
+    python3 -m airflow webserver
     ```
 ## Login infos:
 - ckan:
