@@ -1,7 +1,7 @@
 # simpified DATA CONVERSION MYSQL TO MONGODB 
 
 ## Stack:
-- python 3.8.12
+- python 3.8.13
 - ckan 2.9.5
 - postgres 13
 - solr 6.6.6
@@ -13,26 +13,26 @@
 1. Install and configure [CKAN](https://docs.ckan.org/en/2.9/maintaining/installing/install-from-source.html):
     - Install python virtual environment:
     ```bash
-    pyenv install 3.8.12
-    pyenv virtualenv 3.8.12 dataconv
-    pyenv activate dataconv
+    pyenv install 3.8.13
+    pyenv virtualenv 3.8.13 dataconv
+    echo 'layout pyenv dataconv' > ../.envrc
     ```
     - To install CKAN 2.9.5 and ckanext_mysql2mongodb, run:
     ```bash
-    python3.8 -m pip install --upgrade pip
-    python3.8 -m pip install -r ./config/pre-ckan-installation.txt
-    python3.8 -m pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.9.5#egg=ckan[requirements]'
-    python3.8 -m pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.9.5#egg=ckan[requirements,dev]'
-    python3.8 -m pip install -r ./config/post-ckan-installation.txt
+    python3 -m pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.9.5#egg=ckan[requirements]'
+    python3 -m pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.9.5#egg=ckan[requirements,dev]'
     cd $PYENV_ROOT/versions/dataconv/src/ckan/ckanext/
     git clone https://github.com/Sanius/ckanext_mysql2mongodb && cd ckanext_mysql2mongodb
-    python3.8 setup.py develop
+    python3 -m pip install -r requirements.txt
+    poetry install
+    python3 setup.py develop
     ln -s $PYENV_ROOT/versions/dataconv/src/ckan/ckanext/ckanext_mysql2mongodb ../ckanext_mysql2mongodb
     ```
-    - Generate ckan config file (deprecated):
+    - Generate ckan config file:
     ```bash
-    ckan generate config ./config/ckan.ini
+    ckan generate config ./config/.ckan.ini
     ```
+    - Compare **ckan.ini** with **.ckan.ini**
     - Edit **ckan.ini** (deprecated):
     ```
     sqlalchemy.url = postgresql://sandang:password@localhost:5432/dataconv_ckan
@@ -66,7 +66,7 @@
     - Initialize airflow database and create airflow admin:
     ```bash
     python3.8 -m airflow db init
-    python3.8 -m airflow users create --role Admin --username sandang -f san -l dang --password -e sandang@email.com
+    python3.8 -m airflow users create --role Admin --username sandang -f san -l dang -e sandang@email.com
     ```
     - Compare ~/airflow/airflow.cfg with ./config/airflow.cfg
     - Create **dags** directory inside $AIRFLOW_HOME and copy ./config/dagsbag.py into it.
