@@ -1,3 +1,4 @@
 storage/
 .python-version
 who.ini
+.ckan.ini

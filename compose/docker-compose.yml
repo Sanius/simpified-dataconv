@@ -24,7 +24,7 @@ services:
         environment:
             POSTGRES_USER: ${DATACONV_POSTGRES_USERNAME}
             POSTGRES_PASSWORD: ${DATACONV_POSTGRES_PASSWORD}
-            POSTGRES_MULTIPLE_DATABASES: dataconv_ckan, dataconv_datastore, dataconv_airflow
+            POSTGRES_MULTIPLE_DATABASES: dataconv_ckan, dataconv_datastore, dataconv_airflow, dataconv_validator_logs
         healthcheck:
             test: ["CMD", "pg_isready", "-d dataconv_ckan -U sandang"]
 
@@ -68,7 +68,7 @@ services:
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         volumes:
             - mysql_data:/var/lib/mysql
-            - ./mysql/db-init:/docker-entrypoint-initdb.d
+            - ./mysql:/docker-entrypoint-initdb.d
         ports:
             - ${MYSQL_PORT}:3306
         networks:
